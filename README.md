@@ -1,2 +1,2 @@
-# Python-Notepad
-TKinter Notepad
+# Programming Languages Semester Project
+
