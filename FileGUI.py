@@ -1,107 +1,71 @@
-#FileGUI.py
-
 """
-    Name: Joshua Ludolf
+    Group: TAMUSA Notepad Experts
+    Authors: Joshua Ludolf & Luis Morales
+    Class: CSCI 3366 - Programming Languages
+
 """
 
 import tkinter as tk
-from tkinter import scrolledtext
+from tkinter import scrolledtext, Menu, filedialog
 
-MainWin = None
-message_box = None
-entry_text = None
+class NotePad:
+    def __init__(self, root):
+        self.root = root
+        self.root.geometry("1920x1080")
+        self.root.title("TAMUSA Notepad")
+        self.create_widgets()
 
-def New():
-    global message_box
-    global entry_text
-    
-    entry_text.delete("0","end")
-    message_box.delete("1.0","end")
+    def create_widgets(self):
+        self.create_menu_bar()
+        self.message_box = scrolledtext.ScrolledText(self.root, font="TimesNewRoman", width=210, height=210)
+        self.message_box.configure(bg="#2e2e2e")
+        self.message_box.grid(row=1, column=0, columnspan=3, rowspan=3)
 
-def Save():
-    global message_box
-    global entry_text
+    def create_menu_bar(self):
+        menu_bar = Menu(self.root)
+        self.root.config(menu=menu_bar)
+        
+        file_menu = Menu(menu_bar, tearoff=0)
+        file_menu.configure(bg="#2e2e2e", foreground="#23c4a4")
+        menu_bar.add_cascade(label="File", menu=file_menu)
+        file_menu.add_command(label="New", command=self.new_file)
+        file_menu.add_command(label="Save", command=self.save_file)
+        file_menu.add_command(label="Open", command=self.open_file)
 
-    
-    message = message_box.get("1.0","end")
-    
+    def new_file(self):
+        self.entry_text.delete("0", "end")
+        self.message_box.delete("1.0", "end")
 
-    try:
-        file_name = open(entry_text.get(),"w")
-        file_name.write(message)
-        file_name.close()
+    def save_file(self):
+        message = self.message_box.get("1.0", "end")
+        try:
+            file_path = filedialog.asksaveasfilename(defaultextension=".txt",
+                                                     filetypes=[("Text files", "*.txt"),
+                                                                ("All files", "*.*")])
+            if file_path:
+                with open(file_path, "w") as file_name:
+                    file_name.write(message)
+        except Exception as e:
+            self.message_box.insert(tk.INSERT, f"Error: {e}")
 
-    except:
-        message_box.insert(tk.INSERT, "The File must have a name!")
-    
-    
-
-   
-    
-def Open():
-    global message_box
-    global entry_text
-
-    msg = ""
-
-    try:
-        file_name = entry_text.get()
-
-        in_file = open(file_name, "r")
-        all_lines = in_file.read().split("\n")
-        for Aline in all_lines:
-            msg += Aline + "\n"
-    
-        message_box.insert(tk.INSERT, msg)
-        in_file.close()
-    
-    except FileNotFoundError:
-        message_box.insert(tk.INSERT, "File was not found! Please give an existing file!")
-
-    
-
-
-    
-
-def CreateMainWindow():
-    global MainWin
-    global message_box
-    global entry_text
-
-    MainWin.geometry("400x300")
-    MainWin.title("NotePad - By, Joshua Ludolf")
-
-    btn_new = tk.Button(MainWin, font = "TimesNewRoman", text = "New", command = New)
-    btn_new.grid(row=0, column=0)
-
-    btn_save = tk.Button(MainWin, font = "TimesNewRoman", text = "Save", command = Save)
-    btn_save.grid(row=0, column=1)
-
-    btn_open = tk.Button(MainWin, font = "TimesNewRoman", text = "Open", command = Open)
-    btn_open.grid(row=0, column=2)
-
-    lbl_label = tk.Label(MainWin, font = "TimesNewRoman", text = "File Name:")
-    lbl_label.grid(row = 3, column = 0)
-
-    entry_text = tk.Entry(MainWin, font = "TimesNewRoman", width = 10)
-    entry_text.grid(row = 3, column = 1)
-
-    message_box = tk.scrolledtext.ScrolledText(MainWin, font = "TimesNewRoman", width = 30, height = 8)
-    message_box.grid(row = 1, column = 0, columnspan = 2, rowspan = 2)
-
-
-    
+    def open_file(self):
+        msg = ""
+        try:
+            file_path = filedialog.askopenfilename(filetypes=[("Text files", "*.txt"),
+                                                              ("All files", "*.*")])
+            if file_path:
+                with open(file_path, "r") as in_file:
+                    msg = in_file.read()
+                    self.message_box.delete("1.0", "end")
+                    self.message_box.insert(tk.INSERT, msg)
+        except FileNotFoundError:
+            self.message_box.insert(tk.INSERT, "File was not found! Please provide an existing file.")
 
 def main():
-    global MainWin
-    global entry_text
-
-    MainWin = tk.Tk()
-    CreateMainWindow()
-    MainWin.mainloop()
-
-   
-    
+    root = tk.Tk()
+    root.configure(bg="#2e2e2e")
+    app = NotePad(root)
+    root.mainloop()
 
 if __name__ == "__main__":
     main()
