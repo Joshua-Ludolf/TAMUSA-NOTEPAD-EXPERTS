@@ -1,5 +1,5 @@
 """
-    Group: TAMUSA Notepad Experts
+    Group: TAMUSA Notepad Experts (TNE)
     Authors: Joshua Ludolf & Luis Morales
     Class: CSCI 3366 - Programming Languages
 
