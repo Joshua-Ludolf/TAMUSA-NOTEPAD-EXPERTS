@@ -19,7 +19,7 @@ class NotePad:
 
     def create_widgets(self):
         self.create_menu_bar()
-        self.message_box = scrolledtext.ScrolledText(self.root, font=("Helvetica", 12), width=120, height=40, wrap=tk.WORD)
+        self.message_box = scrolledtext.ScrolledText(self.root, font=("Helvetica", 12), width=165, height=40, wrap=tk.WORD)
         self.message_box.configure(bg="#1e1e1e", fg="#f5f5f5", insertbackground="#f5f5f5", selectbackground="#5c5c5c", font=("Helvetica", 12))
         self.message_box.grid(row=1, column=0, columnspan=3, rowspan=3, padx=10, pady=10)
 
