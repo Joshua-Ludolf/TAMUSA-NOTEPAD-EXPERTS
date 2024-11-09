@@ -9,6 +9,23 @@ from tkinter import scrolledtext, Menu
 import file  # Import the file operations module
 
 class NotePad:
+    """
+    A class to represent a Notepad application.
+    Attributes
+    ----------
+    root : Tk
+        The root window of the application.
+    current_file : list
+        A list to hold the current file path.
+    Methods
+    -------
+    __init__(root):
+        Initializes the Notepad application with the given root window.
+    create_widgets():
+        Creates and configures the widgets for the Notepad application.
+    create_menu_bar():
+        Creates and configures the menu bar for the Notepad application.
+    """
     def __init__(self, root):
         self.root = root
         self.root.geometry("1920x1080")
@@ -33,14 +50,5 @@ class NotePad:
         file_menu.add_command(label="Save", command=lambda: file.save_file(self.message_box, self.current_file), font=("Helvetica", 12))
         file_menu.add_command(label="Save As", command=lambda: file.save_file_as(self.message_box, self.current_file), font=("Helvetica", 12))
         file_menu.add_command(label="Open", command=lambda: file.open_file(self.message_box, self.current_file), font=("Helvetica", 12))
-
-def main():
-    root = tk.Tk()
-    root.configure(bg="#1e1e1e")
-    app = NotePad(root)
-    root.mainloop()
-
-if __name__ == "__main__":
-    main()
 
 
