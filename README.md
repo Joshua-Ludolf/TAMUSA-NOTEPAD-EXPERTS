@@ -1,6 +1,6 @@
 # Programming Languages Semester Project
 
-**Python Text Based Editor**
+**Python Text Based Editor (Notepad)**
 
 This project is a simple text-based editor implemented in Python. It consists of two main components:
 
@@ -10,12 +10,19 @@ This project is a simple text-based editor implemented in Python. It consists of
 
 The editor provides a basic interface for text manipulation, making it a useful tool for learning about file handling and user interface design in Python.
 
-## Functional Approach
+# The project employs a Functional/Object-Oriented programming approach to enhance code readability and maintainability. Key features include:
 
-The project employs a functional programming approach to enhance code readability and maintainability. Key features include:
+## Functional Approach
 
 - **Pure Functions**: Functions are designed to avoid side effects, ensuring that they do not alter any state or data outside their scope.
 - **Immutability**: Data structures are treated as immutable, reducing the likelihood of bugs caused by unintended modifications.
 - **Higher-Order Functions**: Functions that take other functions as arguments or return them as results are used to create more flexible and reusable code.
 
 By leveraging these functional programming principles, the text editor promotes a clean and modular codebase, making it easier to understand and extend.
+
+## Object-Oriented Approach
+- **Abstraction**: Abstraction in OOP allows the creation of simplified models of complex real-world entities by focusing on relevant attributes and behaviors while hiding unnecessary details. This makes the code easier to understand and maintain.
+- **Encapsulation**: OOP bundles data and methods that operate on that data into objects. This encapsulation hides the internal state of objects and only exposes necessary functionalities, enhancing modularity and maintainability.
+- **Inheritance**: OOP supports inheritance, allowing new classes to inherit properties and behaviors from existing classes. This promotes code reuse and can lead to a hierarchical class structure that simplifies the management of related objects.
+- **Modularity and Reusability**: OOP promotes the creation of reusable and modular code. Classes and objects can be reused across different parts of the application or in different projects, reducing redundancy and improving consistency.
+
