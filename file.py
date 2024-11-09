@@ -6,6 +6,14 @@
 import tkinter as tk
 from tkinter import filedialog
 
+"""
+    This module provides functions to create, open, and save files using a Tkinter-based text editor.
+        new_file(message_box, current_file): Clears the content of the message box and resets the current file reference.
+        save_file(message_box, current_file): Saves the content of the message box to the specified file.
+        save_file_as(message_box, current_file): Prompts the user to save the content of a message box to a file.
+        open_file(message_box, current_file): Opens a file dialog to select a file, reads its contents, and displays the contents in the provided message box.
+"""
+
 def new_file(message_box, current_file):
     """
     Clears the content of the message box and resets the current file reference.
