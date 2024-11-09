@@ -1,4 +1,8 @@
 <h1 align="center">Programming Languages Semester Project</h1> 
+<br>
+<p align="center">
+<image  src="tne.png" alt="Jaguar Icon" class="center" ></image>
+</p>
 
 **Python Text Based Editor (Notepad)**
 
@@ -8,6 +12,7 @@ This project is a simple text-based editor implemented in Python. It consists of
 - **file.py**: This file handles file operations such as reading from and writing to files, ensuring that data is correctly managed and stored.
 - **execute.py**: This file contains main function to initialize and run the NotePad application.
 - **tne.ico**: This file is the icon for notepad application.
+- **tne.png**: This file is the png file of icon for ReadMe documentation.
 
 The editor provides a basic interface for text manipulation, making it a useful tool for learning about file handling and user interface design in Python.
 <br>
