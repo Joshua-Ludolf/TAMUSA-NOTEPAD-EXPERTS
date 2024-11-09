@@ -31,6 +31,7 @@ class NotePad:
         self.root.geometry("1920x1080")
         self.root.title("TAMUSA Notepad")
         self.root.font = ("Helvetica", 12)
+        self.root.iconbitmap("tne.ico")
         self.current_file = [None]  # List to hold current file path
         self.create_widgets()
 
