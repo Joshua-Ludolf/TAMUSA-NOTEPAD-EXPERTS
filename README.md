@@ -4,8 +4,9 @@
 
 This project is a simple text-based editor implemented in Python. It consists of two main components:
 
-- **notepad.py**: This file contains the main logic for the text editor, including functions for creating, opening, editing, and saving text files.
+- **notepad.py**: This file contains the Notepad class that represents notepad application.
 - **file.py**: This file handles file operations such as reading from and writing to files, ensuring that data is correctly managed and stored.
+- **execute.py**: This file contains main function to initialize and run the NotePad application.
 
 The editor provides a basic interface for text manipulation, making it a useful tool for learning about file handling and user interface design in Python.
 
