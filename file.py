@@ -44,7 +44,7 @@ def save_file(message_box, current_file):
     else:
         try:
             message = message_box.get("1.0", "end")
-            with open(current_file[0], "w") as file_name:
+            with open(current_file[0], "w", encoding='utf-8') as file_name:
                 file_name.write(message)
         except Exception as e:
             message_box.insert(tk.INSERT, f"Error: {e}")
@@ -74,20 +74,21 @@ def save_file_as(message_box, current_file):
 
 def open_file(message_box, current_file):
     """
-    This module provides a function to open a file and display its contents in a message box.
+    Opens a file and displays its contents in the message box.
 
-    Functions:
-        open_file(message_box, current_file): Opens a file dialog to select a file, reads its contents, 
-                                              and displays the contents in the provided message box.
+    This function opens a file dialog for the user to select a file, reads the contents
+    of the selected file, and displays those contents in the provided message box.
+
+    Args:
+        message_box (tk.Text): The text widget where the file contents will be displayed.
+        current_file (list): A list where the first element will store the path to the opened file.
     """
     try:
-        file_path = filedialog.askopenfilename(filetypes=[("Text files", "*.txt"),
-                                                          ("All files", "*.*")])
+        file_path = filedialog.askopenfilename()
         if file_path:
-            with open(file_path, "r") as in_file:
-                msg = in_file.read()
-                message_box.delete("1.0", "end")
-                message_box.insert(tk.INSERT, msg)
             current_file[0] = file_path
-    except FileNotFoundError:
-        message_box.insert(tk.INSERT, "File was not found! Please provide an existing file.")
+            with open(file_path, "r", encoding='utf-8') as file:
+                message_box.delete("1.0", "end")
+                message_box.insert(tk.INSERT, file.read())
+    except Exception as e:
+        message_box.insert(tk.INSERT, f"Error: {e}")
