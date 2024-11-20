@@ -46,20 +46,15 @@ class NotePad:
         # Text editor with enhanced styling
         self.message_box = scrolledtext.ScrolledText(
             self.main_frame,
-            font=("Cascadia Code", 12),
+            font=("Cascadia Code", 12),  # Font as tuple
             wrap=tk.WORD,
             bg="#1e1e1e",
             fg="#d4d4d4",
             insertbackground="#23c4a4",
             selectbackground="#264f78",
             selectforeground="#ffffff",
-            spacing1=2,  # Add some line spacing
-            spacing2=2,
-            spacing3=2,
             padx=10,
-            pady=10,
-            borderwidth=0,
-            relief=tk.FLAT
+            pady=10
         )
         self.message_box.pack(fill=tk.BOTH, expand=True, padx=10, pady=(5, 10))
 
@@ -110,7 +105,7 @@ class NotePad:
         # Add menu items with modern styling
         for label, command in [
             ("New", lambda: file.new_file(self.message_box, self.current_file)),
-            ("Save", lambda: file.save_file(self.message_box, self.current_file)),
+            ("Save", lambda: self.save_file()),
             ("Save As", lambda: file.save_file_as(self.message_box, self.current_file)),
             ("Open", lambda: file.open_file(self.message_box, self.current_file))
         ]:
@@ -134,3 +129,22 @@ class NotePad:
             self.status_bar.config(text=status_text)
         except Exception as e:
             self.status_bar.config(text="Ready")
+
+    def save_file(self, content=None):
+        """
+        Save the current content to a file.
+        
+        Args:
+            content (str, optional): Content to save. If None, gets content from message_box.
+        """
+        try:
+            if content is None:
+                content = self.message_box.get("1.0", "end-1c")
+            if self.current_file[0] is None:
+                file.save_file_as(self.message_box, self.current_file)
+            else:
+                with open(self.current_file[0], "w", encoding='utf-8') as file_obj:
+                    file_obj.write(content)
+            self.status_bar.config(text="File saved successfully")
+        except Exception as e:
+            self.status_bar.config(text=f"Error saving file: {e}")

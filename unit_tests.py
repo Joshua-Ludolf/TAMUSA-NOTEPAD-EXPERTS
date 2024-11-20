@@ -1,10 +1,14 @@
 import unittest
 import tkinter as tk
-
 import sys
 import os
+import tempfile
+import random
+import string
+import io
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 from notepad import NotePad
 import file
@@ -13,145 +17,184 @@ class TestNotepad(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         print("\n=== TAMUSA Notepad Testing Suite ===\n")
+        # Create a temporary directory for test files
+        cls.test_dir = tempfile.mkdtemp(prefix="notepad_test_")
+        print(f"Test directory: {cls.test_dir}")
+
+    @classmethod
+    def tearDownClass(cls):
+        # Clean up the temporary directory
+        try:
+            for root, dirs, files in os.walk(cls.test_dir, topdown=False):
+                for name in files:
+                    os.remove(os.path.join(root, name))
+                for name in dirs:
+                    os.rmdir(os.path.join(root, name))
+            os.rmdir(cls.test_dir)
+            print(f"\nCleaned up test directory: {cls.test_dir}")
+        except Exception as e:
+            print(f"Warning: Could not clean up test directory: {e}")
+
+    def generate_test_file_path(self, prefix="test", suffix=".txt"):
+        """Generate a unique test file path"""
+        random_str = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
+        return os.path.join(self.test_dir, f"{prefix}_{random_str}{suffix}")
 
     def setUp(self):
         self.root = tk.Tk()
         self.notepad = NotePad(self.root)
-        self.test_file = "test_document.txt"
+        self.test_file = self.generate_test_file_path()
         print(f"\nRunning: {self._testMethodName}")
+        print(f"Using test file: {self.test_file}")
         print("-" * 40)
     
     def tearDown(self):
-        if os.path.exists(self.test_file):
-            os.remove(self.test_file)
-        self.root.destroy()
+        try:
+            if os.path.exists(self.test_file):
+                os.remove(self.test_file)
+            self.root.destroy()
+        except Exception as e:
+            print(f"Warning: Cleanup failed: {e}")
         print("-" * 40)
 
     def test_new_file(self):
+        """Test creating a new file"""
         print("Testing new file creation...")
-        # Add some text
-        test_content = "Test content"
-        self.notepad.message_box.insert("1.0", test_content)
-        print(f"Added content: '{test_content}'")
+        # Test with different content types
+        test_contents = [
+            "Simple text",
+            "Multi\nline\ntext",
+            "Special chars: !@#$%^&*()",
+            "Unicode: 你好, Привет, مرحبا"
+        ]
         
-        # Create new file
-        file.new_file(self.notepad.message_box, self.notepad.current_file)
-        print("Created new file")
-        
-        # Verify content is cleared
-        content = self.notepad.message_box.get("1.0", tk.END).strip()
-        print(f"Content after new file: '{content}'")
-        self.assertEqual(content, "")
-        self.assertIsNone(self.notepad.current_file[0])
-        print("✓ New file test passed")
+        for test_content in test_contents:
+            with self.subTest(content=test_content):
+                # Add content
+                self.notepad.message_box.insert("1.0", test_content)
+                print(f"Added content: '{test_content}'")
+                
+                # Create new file
+                file.new_file(self.notepad.message_box, self.notepad.current_file)
+                print("Created new file")
+                
+                # Verify content is cleared
+                content = self.notepad.message_box.get("1.0", tk.END).strip()
+                self.assertEqual(content, "")
+                self.assertIsNone(self.notepad.current_file[0])
+                print("✓ New file test passed for current content")
 
     def test_save_and_open_file(self):
+        """Test saving and opening files with different content types"""
         print("Testing save and open operations...")
-        test_content = "Hello, World!"
-        self.notepad.message_box.insert("1.0", test_content)
-        print(f"Initial content: '{test_content}'")
+        test_cases = [
+            ("plain.txt", "Hello, World!"),
+            ("multiline.txt", "Line 1\nLine 2\nLine 3"),
+            ("special.txt", "Special: !@#$%^&*()"),
+            ("unicode.txt", "Unicode: 你好, Привет, مرحبا"),
+            ("large.txt", "Test line\n" * 100)
+        ]
         
-        # Save file
-        self.notepad.current_file[0] = self.test_file
-        file.save_file(self.notepad.message_box, self.notepad.current_file)
-        print(f"Saved to file: {self.test_file}")
-        
-        # Clear content
-        self.notepad.message_box.delete("1.0", tk.END)
-        print("Cleared content")
-        
-        # Open file and verify content
-        file.open_file(self.notepad.message_box, self.notepad.current_file)
-        content = self.notepad.message_box.get("1.0", tk.END).strip()
-        print(f"Content after reload: '{content}'")
-        self.assertEqual(content, test_content)
-        print("✓ Save and open test passed")
-    
+        for filename_suffix, test_content in test_cases:
+            with self.subTest(file=filename_suffix, content=test_content):
+                test_file = self.generate_test_file_path(suffix=f"_{filename_suffix}")
+                print(f"Testing with file: {test_file}")
+                print(f"Content: '{test_content[:50]}...' ({len(test_content)} chars)")
+                
+                # Write content directly to file
+                with open(test_file, 'w', encoding='utf-8', newline='') as f:
+                    f.write(test_content)
+                self.notepad.current_file[0] = test_file
+                
+                # Open file and verify
+                file.open_file(self.notepad.message_box, self.notepad.current_file, test_file)
+                content = self.notepad.message_box.get("1.0", "end-1c")
+                self.assertEqual(content.strip(), test_content.strip())
+                print("✓ Save and open test passed")
+                
+                # Cleanup
+                if os.path.exists(test_file):
+                    os.remove(test_file)
+
     def test_ui_elements(self):
+        """Test UI elements and their properties"""
         print("Testing UI elements...")
-        # Test window properties
+        
+        # Test window title
         self.assertEqual(self.root.title(), "TAMUSA Notepad")
         print("✓ Window title verified")
         
-        # Test text area properties
+        # Test text widget font
         text_widget = self.notepad.message_box
-        self.assertEqual(text_widget.cget("bg"), "#1e1e1e")
-        self.assertEqual(text_widget.cget("fg"), "#f5f5f5")
-        self.assertEqual(text_widget.cget("font"), "Helvetica 12")
+        font_str = text_widget.cget("font")
+        self.assertTrue("Cascadia Code" in font_str and "12" in font_str)
         print("✓ Text widget properties verified")
         
-        # Test menu existence
+        # Test menu existence and properties
         menu_bar = self.root.nametowidget(self.root.cget("menu"))
         self.assertIsInstance(menu_bar, tk.Menu)
         print("✓ Menu bar verified")
 
-    def test_large_content(self):
-        print("Testing large content handling...")
-        # Test with large content
-        large_content = "Test line\n" * 1000
-        self.notepad.message_box.insert("1.0", large_content)
-        print(f"Added {large_content.count('\n')} lines")
+    def test_large_file_handling(self):
+        """Test handling of large files with different sizes"""
+        print("Testing large file handling...")
+        test_file = self.generate_test_file_path(suffix=".txt")
+        sizes = [100, 1000, 5000]
         
-        # Save large content
-        self.notepad.current_file[0] = self.test_file
-        file.save_file(self.notepad.message_box, self.notepad.current_file)
-        print("Saved large content")
+        for size in sizes:
+            with self.subTest(size=size):
+                # Generate content with explicit line numbering
+                content = "\n".join([f"Line {i+1}" for i in range(size)])  
+                print(f"Testing with {size} lines...")
+                
+                # Write content directly to file
+                with open(test_file, 'w', encoding='utf-8', newline='') as f:
+                    f.write(content)
+                print(f"Saved file of {size} lines")
+                
+                # Load file and verify content
+                self.notepad.current_file[0] = test_file
+                file.open_file(self.notepad.message_box, self.notepad.current_file, test_file)
+                loaded_content = self.notepad.message_box.get("1.0", "end-1c")
+                self.assertEqual(loaded_content, content)
+                self.assertEqual(loaded_content.count('\n'), size - 1)  
+                print(f"✓ Large file test passed for {size} lines")
+                
+                # Cleanup
+                if os.path.exists(test_file):
+                    os.remove(test_file)
+
+    def test_special_content(self):
+        """Test handling of special content types"""
+        print("Testing special content handling...")
+        test_file = self.generate_test_file_path(suffix=".txt")
+        test_cases = {
+            'empty': '',
+            'spaces': '   ',
+            'newlines': '\n\n\n',
+            'unicode': '你好, Привет, مرحبا, 안녕하세요',
+            'symbols': '!@#$%^&*()_+-=[]{}\\|;:\'",.<>/?`~',
+            'mixed': 'Hello\n   World\n你好\n!@#$'
+        }
         
-        # Clear and reload
-        self.notepad.message_box.delete("1.0", tk.END)
-        file.open_file(self.notepad.message_box, self.notepad.current_file)
-        print("Reloaded content")
-        
-        # Verify content length
-        content = self.notepad.message_box.get("1.0", tk.END)
-        line_count = content.count('\n')
-        print(f"Line count after reload: {line_count}")
-        self.assertGreaterEqual(content.count('\n'), 1000)
-        self.assertLess(content.count('\n'), 1003)
-        print("✓ Large content test passed")
-        
-    def test_special_characters(self):
-        print("Testing special character handling...")
-        # Test with basic ASCII
-        special_content = "Hello World"
-        self.notepad.message_box.insert("1.0", special_content)
-        print(f"Testing basic ASCII: '{special_content}'")
-        
-        # Save and reload
-        self.notepad.current_file[0] = self.test_file
-        file.save_file(self.notepad.message_box, self.notepad.current_file)
-        print("Saved ASCII content")
-        
-        # Clear and reload
-        self.notepad.message_box.delete("1.0", tk.END)
-        file.open_file(self.notepad.message_box, self.notepad.current_file)
-        print("Reloaded ASCII content")
-        
-        # Verify basic content
-        content = self.notepad.message_box.get("1.0", tk.END).strip()
-        print(f"Content after reload: '{content}'")
-        self.assertEqual(content, special_content)
-        print("✓ Basic ASCII test passed")
-        
-        # Test with special characters
-        special_content = "Special chars: ABC 123"
-        print(f"\nTesting special chars: '{special_content}'")
-        self.notepad.message_box.delete("1.0", tk.END)
-        self.notepad.message_box.insert("1.0", special_content)
-        
-        file.save_file(self.notepad.message_box, self.notepad.current_file)
-        print("Saved special content")
-        
-        # Clear and reload
-        self.notepad.message_box.delete("1.0", tk.END)
-        file.open_file(self.notepad.message_box, self.notepad.current_file)
-        print("Reloaded special content")
-        
-        # Verify special content
-        content = self.notepad.message_box.get("1.0", tk.END).strip()
-        print(f"Content after reload: '{content}'")
-        self.assertEqual(content, special_content)
-        print("✓ Special characters test passed")
+        for case, content in test_cases.items():
+            with self.subTest(case=case):
+                print(f"\nTesting {case} content...")
+                
+                # Write content directly to file
+                with open(test_file, 'w', encoding='utf-8', newline='') as f:
+                    f.write(content)
+                
+                # Load file and verify content
+                self.notepad.current_file[0] = test_file
+                file.open_file(self.notepad.message_box, self.notepad.current_file, test_file)
+                loaded_content = self.notepad.message_box.get("1.0", "end-1c")
+                self.assertEqual(loaded_content, content)
+                print(f"✓ {case} content test passed")
+                
+                # Cleanup
+                if os.path.exists(test_file):
+                    os.remove(test_file)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

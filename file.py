@@ -25,70 +25,76 @@ def new_file(message_box, current_file):
     message_box.delete("1.0", "end")
     current_file[0] = None
 
-def save_file(message_box, current_file):
+def save_file(message_box, current_file, content=None):
     """
     Saves the content of the message box to the specified file.
-
-    If no file is currently selected, it calls the save_file_as function to prompt the user to select a file.
-    Otherwise, it writes the content of the message box to the currently selected file.
 
     Args:
         message_box (tk.Text): The text widget containing the message to be saved.
         current_file (list): A list where the first element is the path to the current file.
+        content (str): The content to be saved. If None, the content of the message box will be used.
 
-    Raises:
-        Exception: If an error occurs during the file writing process, it inserts an error message into the message box.
+    Returns:
+        bool: True if the file was saved successfully, False otherwise.
     """
-    if current_file[0] is None:
-        save_file_as(message_box, current_file)
-    else:
-        try:
-            message = message_box.get("1.0", "end")
-            with open(current_file[0], "w", encoding='utf-8') as file_name:
-                file_name.write(message)
-        except Exception as e:
-            message_box.insert(tk.INSERT, f"Error: {e}")
+    try:
+        if content is None:
+            content = message_box.get("1.0", "end-1c")
+        with open(current_file[0], 'w', encoding='utf-8', newline='') as f:
+            f.write(content)
+        return True
+    except Exception as e:
+        print(f"Error saving file: {e}")
+        return False
 
-def save_file_as(message_box, current_file):
+def save_file_as(message_box, current_file, target_path=None):
     """
-    Prompts the user to save the content of a message box to a file.
+    Save the current file as a new file
 
     Args:
         message_box (tk.Text): The text widget containing the message to be saved.
         current_file (list): A list containing the current file path as its first element.
+        target_path (str): The path to save the file. If None, a file dialog will be opened.
 
-    Raises:
-        Exception: If an error occurs during the file saving process, it will be caught and displayed in the message box.
+    Returns:
+        bool: True if the file was saved successfully, False otherwise.
     """
     try:
-        message = message_box.get("1.0", "end")
-        file_path = filedialog.asksaveasfilename(defaultextension=".txt",
-                                                 filetypes=[("Text files", "*.txt"),
-                                                            ("All files", "*.*")])
-        if file_path:
-            with open(file_path, "w") as file_name:
-                file_name.write(message)
-            current_file[0] = file_path
+        if target_path is None:
+            target_path = filedialog.asksaveasfilename(defaultextension=".txt",
+                                                    filetypes=[("Text files", "*.txt"), ("All files", "*.*")])
+        if target_path:
+            current_file[0] = target_path
+            content = message_box.get("1.0", "end-1c")
+            with open(target_path, 'w', encoding='utf-8', newline='') as f:
+                f.write(content)
+            return True
     except Exception as e:
-        message_box.insert(tk.INSERT, f"Error: {e}")
+        print(f"Error saving file: {e}")
+    return False
 
-def open_file(message_box, current_file):
+def open_file(message_box, current_file, file_path=None):
     """
-    Opens a file and displays its contents in the message box.
-
-    This function opens a file dialog for the user to select a file, reads the contents
-    of the selected file, and displays those contents in the provided message box.
+    Open a file and load its contents into the text box
 
     Args:
         message_box (tk.Text): The text widget where the file contents will be displayed.
         current_file (list): A list where the first element will store the path to the opened file.
+        file_path (str): The path to the file to be opened. If None, a file dialog will be opened.
+
+    Returns:
+        bool: True if the file was opened successfully, False otherwise.
     """
     try:
-        file_path = filedialog.askopenfilename()
+        if file_path is None:
+            file_path = filedialog.askopenfilename(filetypes=[("Text files", "*.txt"), ("All files", "*.*")])
         if file_path:
             current_file[0] = file_path
-            with open(file_path, "r", encoding='utf-8') as file:
-                message_box.delete("1.0", "end")
-                message_box.insert(tk.INSERT, file.read())
+            with open(file_path, 'r', encoding='utf-8', newline='') as f:
+                content = f.read()
+            message_box.delete("1.0", tk.END)
+            message_box.insert("1.0", content)
+            return True
     except Exception as e:
-        message_box.insert(tk.INSERT, f"Error: {e}")
+        print(f"Error opening file: {e}")
+    return False
