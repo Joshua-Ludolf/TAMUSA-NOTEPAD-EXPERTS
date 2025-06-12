@@ -39,4 +39,4 @@ The editor provides a basic interface for text manipulation, making it a useful 
 ### Additional Features:
 
 - **UV Package Manager Support**: See documentation from developer of this amazing python package manager - https://docs.astral.sh/uv/.
-- **Emojis**: Based on Windows 11 builtin Emojis, allow for user expressions via visuals.
+- **Emojis**: Based on Windows 11 builtin Emojis, allow for user expressions via visuals. In application, under Edit tab you'll find two options for inserting emojis, one less you manually pick from all emojis (`CTRL+E` also achieves this!) and the other is a reduced list from all types of emojis. 
