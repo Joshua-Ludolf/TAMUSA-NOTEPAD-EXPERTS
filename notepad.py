@@ -133,15 +133,13 @@ class NotePad:
         
         # Bind emoji shortcuts
         self.message_box.bind("<Control-e>", self.show_emoji_picker)
-        self.message_box.bind("<Control-E>", self.show_emoji_picker)
-        
-        # Bind font shortcuts
-        self.message_box.bind("<Control-plus>", lambda e: self.font_manager.increase_font_size())
-        self.message_box.bind("<Control-equal>", lambda e: self.font_manager.increase_font_size())  # For keyboards without numpad
-        self.message_box.bind("<Control-minus>", lambda e: self.font_manager.decrease_font_size())
-        self.message_box.bind("<Control-b>", lambda e: self.font_manager.toggle_bold())
-        self.message_box.bind("<Control-i>", lambda e: self.font_manager.toggle_italic())
-        self.message_box.bind("<Control-u>", lambda e: self.font_manager.toggle_underline())
+        self.message_box.bind("<Control-E>", self.show_emoji_picker)        # Bind font shortcuts
+        self.message_box.bind("<Control-plus>", self._handle_increase_font)
+        self.message_box.bind("<Control-equal>", self._handle_increase_font)  # For keyboards without numpad
+        self.message_box.bind("<Control-minus>", self._handle_decrease_font)
+        self.message_box.bind("<Control-b>", self._handle_toggle_bold)
+        self.message_box.bind("<Control-i>", self._handle_toggle_italic)
+        self.message_box.bind("<Control-u>", self._handle_toggle_underline)
         self.message_box.bind("<Control-Shift-F>", lambda e: self.font_manager.show_font_dialog(self.root))
 
     def show_emoji_picker(self, event=None):
@@ -161,6 +159,31 @@ class NotePad:
                 self.root.after(2000, lambda: self.status_bar.config(text="Ready") if hasattr(self, 'status_bar') else None)
         except Exception as e:
             print(f"Error inserting emoji: {e}")
+
+    def _handle_increase_font(self, event):
+        """Handle Ctrl++ and Ctrl+= for increasing font size"""
+        self.font_manager.increase_font_size()
+        return "break"
+    
+    def _handle_decrease_font(self, event):
+        """Handle Ctrl+- for decreasing font size"""
+        self.font_manager.decrease_font_size()
+        return "break"
+    
+    def _handle_toggle_bold(self, event):
+        """Handle Ctrl+B for toggling bold formatting"""
+        self.font_manager.toggle_bold()
+        return "break"
+    
+    def _handle_toggle_italic(self, event):
+        """Handle Ctrl+I for toggling italic formatting"""
+        self.font_manager.toggle_italic()
+        return "break"
+    
+    def _handle_toggle_underline(self, event):
+        """Handle Ctrl+U for toggling underline formatting"""
+        self.font_manager.toggle_underline()
+        return "break"
 
     def create_file_tree(self):
         # Style configuration for the tree

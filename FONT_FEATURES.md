@@ -1,11 +1,11 @@
 # Font Management Features
 
-The TAMUSA Notepad now includes comprehensive font management capabilities that allow users to customize the appearance of their text files.
+The TAMUSA Notepad now includes comprehensive font management capabilities that allow users to customize the appearance of their text files, for their own viewing (doesn't change actual font size when saved, this more about accessibility).
 
 ## Features
 
 ### Font Dialog
-- **Access**: Format → Font... (Ctrl+Shift+F)
+- **Access**: Format → Font... (`Ctrl+Shift+F`)
 - Choose from all available system fonts
 - Select font size (6-72 pt)
 - Apply font styles: Bold, Italic, Underline, Strikethrough
