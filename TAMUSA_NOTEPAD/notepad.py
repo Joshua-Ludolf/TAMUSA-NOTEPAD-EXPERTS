@@ -5,11 +5,11 @@
 """
 
 import tkinter as tk
-from tkinter import scrolledtext, Menu, ttk
-import file
-import os
-import pathlib
-import re
+import file, emoji, os, pathlib, re
+from tkinter import scrolledtext, Menu, ttk, messagebox, Toplevel
+from emoji import EmojiPicker
+
+
 
 class NotePad:
     """
@@ -24,10 +24,42 @@ class NotePad:
     -------
     __init__(root):
         Initializes the Notepad application with the given root window.
+        
     create_widgets():
         Creates and configures the widgets for the Notepad application.
+
     create_menu_bar():
         Creates and configures the menu bar for the Notepad application.
+
+    show_emoji_picker(event=None):
+        Displays the emoji picker dialog.
+
+    insert_emoji_at_cursor(emoji):
+        Inserts the selected emoji at the current cursor position in the text editor.
+
+    create_file_tree():
+        Creates a file tree view to navigate through the file system.
+
+    populate_tree(path="."):
+        Populates the file tree with directories and files starting from the given path.
+
+    add_directory(parent, path, depth=0):
+        Recursively adds directories and files to the file tree view.
+
+    load_more(parent):
+        Loads more items in a directory when requested.
+
+    on_tree_double_click(event):
+        Handles double-click events on the file tree to open files or expand directories.
+
+    format_size(size):
+        Formats the size of a file in a human-readable format (B, KB, MB, etc.).
+
+    update_status(event=None):
+        Updates the status bar with the current cursor position and file information.
+
+    save_file(content=None):
+        Saves the current content of the text editor to a file.
     """
     def __init__(self, root):
         self.root = root
@@ -90,6 +122,28 @@ class NotePad:
         # Bind events for status updates
         self.message_box.bind("<KeyPress>", self.update_status)
         self.message_box.bind("<KeyRelease>", self.update_status)
+        
+        # Bind emoji shortcuts
+        self.message_box.bind("<Control-e>", self.show_emoji_picker)
+        self.message_box.bind("<Control-E>", self.show_emoji_picker)
+
+    def show_emoji_picker(self, event=None):
+        """Show the emoji picker dialog"""
+        EmojiPicker(self.root, self.insert_emoji_at_cursor)
+        
+    def insert_emoji_at_cursor(self, emoji):
+        """Insert emoji at the current cursor position"""
+        try:
+            cursor_pos = self.message_box.index(tk.INSERT)
+            self.message_box.insert(cursor_pos, emoji)
+            self.message_box.focus_set()
+            # Update status bar
+            if hasattr(self, 'status_bar') and self.root.winfo_exists():
+                self.status_bar.config(text=f"Inserted emoji: {emoji}")
+                # Clear the message after 2 seconds
+                self.root.after(2000, lambda: self.status_bar.config(text="Ready") if hasattr(self, 'status_bar') else None)
+        except Exception as e:
+            print(f"Error inserting emoji: {e}")
 
     def create_file_tree(self):
         # Style configuration for the tree
@@ -222,6 +276,7 @@ class NotePad:
             for entry in files:
                 try:
                     size = self.format_size(entry.stat().st_size)
+                    
                     self.tree.insert(parent, "end",
                                    text=f"{self.file_icon} {entry.name}",
                                    values=(size, entry.path))
@@ -235,20 +290,40 @@ class NotePad:
         item = self.tree.selection()[0]
         item_text = self.tree.item(item)["text"]
         
-        if item_text.startswith(self.file_icon):
-            # Handle file opening
+        if item_text.startswith(self.file_icon):            # Handle file opening
             full_path = self.tree.item(item)["values"][1]
             self.status_bar.config(text=f"Opening: {full_path}")
             
             try:
-                with open(full_path, 'r', encoding='utf-8') as file:
-                    content = file.read()
-                    self.message_box.delete(1.0, tk.END)
-                    self.message_box.insert(1.0, content)
-                    self.current_file[0] = full_path
-                    self.update_status()
+                # Try UTF-8 first
+                try:
+                    with open(full_path, 'r', encoding='utf-8') as file:
+                        content = file.read()
+                except UnicodeDecodeError:
+                    # If UTF-8 fails, try with different encodings
+                    encodings = ['latin-1', 'cp1252', 'ascii', 'utf-16']
+                    content = None
+                    for encoding in encodings:
+                        try:
+                            with open(full_path, 'r', encoding=encoding) as file:
+                                content = file.read()
+                            break
+                        except UnicodeDecodeError:
+                            continue
+                    
+                    if content is None:
+                        # If all text encodings fail, try reading as binary and decode
+                        with open(full_path, 'rb') as file:
+                            raw_content = file.read()
+                            content = raw_content.decode('utf-8', errors='replace')
+                
+                self.message_box.delete(1.0, tk.END)
+                self.message_box.insert(1.0, content)
+                self.current_file[0] = full_path
+                self.update_status()
             except Exception as e:
-                self.status_bar.config(text=f"Error opening file: {str(e)} | Path: {full_path}")
+                if hasattr(self, 'status_bar') and self.root.winfo_exists():
+                    self.status_bar.config(text=f"Error opening file: {str(e)} | Path: {full_path}")
         elif item_text.startswith("..."):
             # If clicking on "... more items", load the full directory
             parent = self.tree.parent(item)
@@ -309,7 +384,64 @@ class NotePad:
                 compound=tk.LEFT,
                 activebackground="#3e3e3e",
                 activeforeground="#23c4a4"
-            )
+            )        # Edit menu with emoji functionality
+        edit_menu = Menu(
+            menu_bar,
+            tearoff=0,
+            bg="#2d2d2d",
+            fg="#ffffff",
+            activebackground="#3e3e3e",
+            activeforeground="#23c4a4",
+            font=("Cascadia Code", 11),
+            relief=tk.FLAT,
+            borderwidth=0
+        )
+        menu_bar.add_cascade(label="Edit", menu=edit_menu)
+        
+        # Main emoji picker option
+        edit_menu.add_command(
+            label="Insert Emoji... (Ctrl+E)",
+            command=self.show_emoji_picker,
+            font=("Cascadia Code", 11),
+            activebackground="#3e3e3e",
+            activeforeground="#23c4a4"
+        )
+        
+        edit_menu.add_separator()
+        
+        # Quick access emoji submenu
+        emoji_submenu = Menu(
+            edit_menu,
+            tearoff=0,
+            bg="#2d2d2d",
+            fg="#ffffff",
+            activebackground="#3e3e3e",
+            activeforeground="#23c4a4",
+            font=("Cascadia Code", 11),
+            relief=tk.FLAT,
+            borderwidth=0
+        )
+        edit_menu.add_cascade(label="Quick Emojis", menu=emoji_submenu)
+        
+        # Add common emoji shortcuts to submenu
+        common_emojis = [
+            ("😀 Grinning Face", "😀"),
+            ("😂 Face with Tears of Joy", "😂"),
+            ("❤️ Red Heart", "❤️"),
+            ("👍 Thumbs Up", "👍"),
+            ("🎉 Party Popper", "🎉"),
+            ("🔥 Fire", "🔥"),
+            ("✨ Sparkles", "✨"),
+            ("🚀 Rocket", "🚀")
+        ]
+        
+        for label, emoji in common_emojis:
+            emoji_submenu.add_command(
+                label=label,
+                command=lambda e=emoji: self.insert_emoji_at_cursor(e),
+                font=("Cascadia Code", 11),
+                activebackground="#3e3e3e",
+                activeforeground="#23c4a4"            )
 
     def update_status(self, event=None):
         """Update status bar with cursor position and file info"""
@@ -319,9 +451,14 @@ class NotePad:
             file_name = self.current_file[0] if self.current_file[0] else "Untitled"
             file_name = file_name.split('/')[-1]  # Show only filename, not full path
             status_text = f"Line: {line} | Col: {int(col)+1} | {file_name}"
-            self.status_bar.config(text=status_text)
+            if hasattr(self, 'status_bar') and self.root.winfo_exists():
+                self.status_bar.config(text=status_text)
+        except tk.TclError:
+            # Widget has been destroyed
+            pass
         except Exception as e:
-            self.status_bar.config(text="Ready")
+            if hasattr(self, 'status_bar') and self.root.winfo_exists():
+                self.status_bar.config(text="Ready")
 
     def save_file(self, content=None):
         """
@@ -338,6 +475,12 @@ class NotePad:
             else:
                 with open(self.current_file[0], "w", encoding='utf-8') as file_obj:
                     file_obj.write(content)
-            self.status_bar.config(text="File saved successfully")
+            # Only update status bar if the widget still exists
+            if hasattr(self, 'status_bar') and self.root.winfo_exists():
+                self.status_bar.config(text="File saved successfully")
+        except tk.TclError:
+            # Widget has been destroyed, ignore
+            pass
         except Exception as e:
-            self.status_bar.config(text=f"Error saving file: {e}")
+            if hasattr(self, 'status_bar') and self.root.winfo_exists():
+                self.status_bar.config(text=f"Error saving file: {e}")

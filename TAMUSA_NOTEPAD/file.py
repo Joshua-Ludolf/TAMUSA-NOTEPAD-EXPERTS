@@ -90,8 +90,25 @@ def open_file(message_box, current_file, file_path=None):
             file_path = filedialog.askopenfilename(filetypes=[("Text files", "*.txt"), ("All files", "*.*")])
         if file_path:
             current_file[0] = file_path
-            with open(file_path, 'r', encoding='utf-8', newline='') as f:
-                content = f.read()
+            
+            # Try different encodings
+            content = None
+            encodings = ['utf-8', 'latin-1', 'cp1252', 'ascii', 'utf-16']
+            
+            for encoding in encodings:
+                try:
+                    with open(file_path, 'r', encoding=encoding, newline='') as f:
+                        content = f.read()
+                    break
+                except UnicodeDecodeError:
+                    continue
+            
+            # If all text encodings fail, read as binary and decode with error replacement
+            if content is None:
+                with open(file_path, 'rb') as f:
+                    raw_content = f.read()
+                    content = raw_content.decode('utf-8', errors='replace')
+            
             message_box.delete("1.0", tk.END)
             message_box.insert("1.0", content)
             return True

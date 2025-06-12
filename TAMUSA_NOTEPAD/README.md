@@ -31,3 +31,7 @@ The editor provides a basic interface for text manipulation, making it a useful 
 - **Inheritance**: OOP supports inheritance, allowing new classes to inherit properties and behaviors from existing classes. This promotes code reuse and can lead to a hierarchical class structure that simplifies the management of related objects.
 - **Modularity and Reusability**: OOP promotes the creation of reusable and modular code. Classes and objects can be reused across different parts of the application or in different projects, reducing redundancy and improving consistency.
 
+### Additional Features:
+
+- **UV Package Manager Support**: See documentation from developer of this amazing python package manager - https://astral.sh/blog/uv.
+- **Emojis**: Based on Windows 11 builtin Emojis, allow for user expressions via visuals.

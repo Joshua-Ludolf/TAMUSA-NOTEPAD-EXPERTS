@@ -14,19 +14,28 @@ last_content = ""  # Store the last known content
 
 def save_notes():
     """Save notes if there's an active file"""
-    global app, last_content
+    global app, last_content, is_running
     try:
-        if app and hasattr(app, 'current_file') and app.current_file[0]:
+        if (is_running and app and hasattr(app, 'current_file') and 
+            app.current_file[0] and hasattr(app, 'root') and 
+            app.root.winfo_exists()):
             app.save_file(last_content)
+    except tk.TclError:
+        # Widget has been destroyed, stop trying to save
+        is_running = False
     except Exception as e:
         print(f"Error during auto-save: {str(e)}")
 
 def update_content():
     """Update the last known content"""
-    global app, last_content
+    global app, last_content, is_running
     try:
-        if app and hasattr(app, 'message_box'):
+        if (is_running and app and hasattr(app, 'message_box') and 
+            hasattr(app, 'root') and app.root.winfo_exists()):
             last_content = app.message_box.get('1.0', tk.END)
+    except tk.TclError:
+        # Widget has been destroyed
+        is_running = False
     except Exception:
         pass  # Ignore errors during content update
 
@@ -67,14 +76,19 @@ def main():
 
     def auto_save():
         """Recursive function to handle auto-saving"""
+        global is_running
         if is_running:
             try:
                 update_content()  # Update content before saving
                 save_notes()
                 if is_running:  # Check again in case status changed during save
                     root.after(1000, auto_save)
+            except tk.TclError:
+                # Widget destroyed, stop auto-save
+                is_running = False
             except Exception as e:
-                print(f"Error in auto-save: {str(e)}")
+                if is_running:  # Only print if we're still supposed to be running
+                    print(f"Error in auto-save: {str(e)}")
 
     # Start the auto-save cycle
     auto_save()
