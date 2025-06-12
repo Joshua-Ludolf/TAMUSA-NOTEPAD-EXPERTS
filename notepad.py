@@ -5,7 +5,7 @@
 """
 
 import tkinter as tk
-import file, emoji, os, pathlib, re
+import file, emoji, fonts, os, pathlib, re
 from tkinter import scrolledtext, Menu, ttk, messagebox, Toplevel
 from emoji import EmojiPicker
 
@@ -69,14 +69,16 @@ class NotePad:
         self.root.font = ("Cascadia Code", 12)  # Modern coding font
         self.root.iconbitmap("tne.ico")
         self.current_file = [None]
+        
+        # Initialize font manager (will be set after text widget is created)
+        self.font_manager = None
+        
         self.create_widgets()
-
+    
     def create_widgets(self):
         # Create main container frame
         self.main_frame = tk.Frame(self.root, bg="#1a1a1a")
         self.main_frame.pack(fill=tk.BOTH, expand=True, padx=2, pady=2)
-
-        self.create_menu_bar()
 
         # Create horizontal paned window
         self.paned_window = ttk.PanedWindow(self.main_frame, orient=tk.HORIZONTAL)
@@ -106,6 +108,12 @@ class NotePad:
         )
         self.message_box.pack(fill=tk.BOTH, expand=True)
 
+        # Initialize font manager after text widget is created
+        self.font_manager = fonts.create_font_manager(self.message_box)
+
+        # Create menu bar after font manager is initialized
+        self.create_menu_bar()
+
         # Create status bar
         self.status_bar = tk.Label(
             self.main_frame,
@@ -126,6 +134,15 @@ class NotePad:
         # Bind emoji shortcuts
         self.message_box.bind("<Control-e>", self.show_emoji_picker)
         self.message_box.bind("<Control-E>", self.show_emoji_picker)
+        
+        # Bind font shortcuts
+        self.message_box.bind("<Control-plus>", lambda e: self.font_manager.increase_font_size())
+        self.message_box.bind("<Control-equal>", lambda e: self.font_manager.increase_font_size())  # For keyboards without numpad
+        self.message_box.bind("<Control-minus>", lambda e: self.font_manager.decrease_font_size())
+        self.message_box.bind("<Control-b>", lambda e: self.font_manager.toggle_bold())
+        self.message_box.bind("<Control-i>", lambda e: self.font_manager.toggle_italic())
+        self.message_box.bind("<Control-u>", lambda e: self.font_manager.toggle_underline())
+        self.message_box.bind("<Control-Shift-F>", lambda e: self.font_manager.show_font_dialog(self.root))
 
     def show_emoji_picker(self, event=None):
         """Show the emoji picker dialog"""
@@ -442,6 +459,113 @@ class NotePad:
                 font=("Cascadia Code", 11),
                 activebackground="#3e3e3e",
                 activeforeground="#23c4a4"            )
+
+        # Format menu with font functionality
+        format_menu = Menu(
+            menu_bar,
+            tearoff=0,
+            bg="#2d2d2d",
+            fg="#ffffff",
+            activebackground="#3e3e3e",
+            activeforeground="#23c4a4",
+            font=("Cascadia Code", 11),
+            relief=tk.FLAT,
+            borderwidth=0
+        )
+        menu_bar.add_cascade(label="Format", menu=format_menu)
+        
+        # Font dialog option
+        format_menu.add_command(
+            label="Font... (Ctrl+Shift+F)",
+            command=lambda: self.font_manager.show_font_dialog(self.root),
+            font=("Cascadia Code", 11),
+            activebackground="#3e3e3e",
+            activeforeground="#23c4a4"
+        )
+        
+        format_menu.add_separator()
+        
+        # Font size controls
+        format_menu.add_command(
+            label="Increase Font Size (Ctrl++)",
+            command=self.font_manager.increase_font_size,
+            font=("Cascadia Code", 11),
+            activebackground="#3e3e3e",
+            activeforeground="#23c4a4"
+        )
+        
+        format_menu.add_command(
+            label="Decrease Font Size (Ctrl+-)",
+            command=self.font_manager.decrease_font_size,
+            font=("Cascadia Code", 11),
+            activebackground="#3e3e3e",
+            activeforeground="#23c4a4"
+        )
+        
+        format_menu.add_separator()
+        
+        # Font style toggles
+        format_menu.add_command(
+            label="Toggle Bold (Ctrl+B)",
+            command=self.font_manager.toggle_bold,
+            font=("Cascadia Code", 11),
+            activebackground="#3e3e3e",
+            activeforeground="#23c4a4"
+        )
+        
+        format_menu.add_command(
+            label="Toggle Italic (Ctrl+I)",
+            command=self.font_manager.toggle_italic,
+            font=("Cascadia Code", 11),
+            activebackground="#3e3e3e",
+            activeforeground="#23c4a4"
+        )
+        
+        format_menu.add_command(
+            label="Toggle Underline (Ctrl+U)",
+            command=self.font_manager.toggle_underline,
+            font=("Cascadia Code", 11),
+            activebackground="#3e3e3e",
+            activeforeground="#23c4a4"
+        )
+        
+        format_menu.add_command(
+            label="Toggle Strikethrough",
+            command=self.font_manager.toggle_strikethrough,
+            font=("Cascadia Code", 11),
+            activebackground="#3e3e3e",
+            activeforeground="#23c4a4"
+        )
+        
+        format_menu.add_separator()
+        
+        # Color options
+        format_menu.add_command(
+            label="Text Color...",
+            command=self.font_manager.change_text_color,
+            font=("Cascadia Code", 11),
+            activebackground="#3e3e3e",
+            activeforeground="#23c4a4"
+        )
+        
+        format_menu.add_command(
+            label="Background Color...",
+            command=self.font_manager.change_background_color,
+            font=("Cascadia Code", 11),
+            activebackground="#3e3e3e",
+            activeforeground="#23c4a4"
+        )
+        
+        format_menu.add_separator()
+        
+        # Reset option  
+        format_menu.add_command(
+            label="Reset to Default",
+            command=self.font_manager.reset_to_default,
+            font=("Cascadia Code", 11),
+            activebackground="#3e3e3e",
+            activeforeground="#23c4a4"
+        )
 
     def update_status(self, event=None):
         """Update status bar with cursor position and file info"""

@@ -8,16 +8,16 @@
 
 This project is a simple text-based editor implemented in Python. It consists of three main components for basic notepad functionality:
 
-- **notepad.py**: This file contains the Notepad class that represents notepad application.
-- **file.py**: This file handles file operations such as reading from and writing to files, ensuring that data is correctly managed and stored.
-- **execute.py**: This file contains main function to initialize and run the NotePad application.
+- **`notepad.py`**: This file contains the Notepad class that represents notepad application.
+- **`file.py`**: This file handles file operations such as reading from and writing to files, ensuring that data is correctly managed and stored.
+- **`execute.py`**: This file contains main function to initialize and run the NotePad application.
   
 Other components:
-- **pyproject.toml**: This file is used by the UV package manager, see additional features for documentation.
-- **tne.ico**: This file is the icon for notepad application.
-- **tne.png**: This file is the png file of icon for ReadMe documentation.
-- **emoji.py**: This file contains EmojiPicker class that allows user to insert application builtin emojis.
-- **unittest.py**: This file contains unit test for this application, primarily for basic utilization of this software.
+- **`pyproject.toml`**: This file is used by the UV package manager, see additional features for documentation.
+- **`tne.ico`**: This file is the icon for notepad application.
+- **`tne.png`**: This file is the png file of icon for ReadMe documentation.
+- **`emoji.py`**: This file contains EmojiPicker class that allows user to insert application builtin emojis.
+- **`unittest.py`**: This file contains unit test for this application, primarily for basic utilization of this software.
   
 The editor provides a basic interface for text manipulation, making it a useful tool for learning about file handling and user interface design in Python.
 <br>
@@ -38,5 +38,9 @@ The editor provides a basic interface for text manipulation, making it a useful 
 
 ### Additional Features:
 
-- **UV Package Manager Support**: See documentation from developer of this amazing python package manager - https://docs.astral.sh/uv/.
 - **Emojis**: Based on Windows 11 builtin Emojis, allow for user expressions via visuals. In application, under Edit tab you'll find two options for inserting emojis, one less you manually pick from all emojis (`CTRL+E` also achieves this!) and the other is a reduced list from all types of emojis. 
+- **Font Management**: `See FONT_FEATURES.md`
+- **UV Package Manager Support**: See documentation from developer of this amazing python package manager - `https://docs.astral.sh/uv/.`
+
+
+

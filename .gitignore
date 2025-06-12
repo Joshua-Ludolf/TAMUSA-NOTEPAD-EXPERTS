@@ -4,3 +4,4 @@ __pycache__/*
 *.txt
 uv.lock
 .venv/
+font_config.json
