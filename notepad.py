@@ -67,7 +67,10 @@ class NotePad:
         self.root.title("TAMUSA Notepad")
         self.root.configure(bg="#1a1a1a")  # Dark background for the main window
         self.root.font = ("Cascadia Code", 12)  # Modern coding font
-        self.root.iconbitmap("tne.ico")
+        try:
+            self.root.iconbitmap("tne.ico")
+        except tk.TclError:
+            pass  # Icon not supported on this platform
         self.current_file = [None]
         
         # Initialize font manager (will be set after text widget is created)
@@ -222,8 +225,9 @@ class NotePad:
         # Bind double-click event
         self.tree.bind("<Double-1>", self.on_tree_double_click)
 
-        # Populate tree with Users directory
-        self.populate_tree(r"C:\Users")
+        # Populate tree with user's home directory
+        import pathlib
+        self.populate_tree(str(pathlib.Path.home()))
 
     def populate_tree(self, path="."):
         # Clear existing items
@@ -239,7 +243,8 @@ class NotePad:
                                        values=("", abs_path))
             self.add_directory(root_node, abs_path)
         except Exception as e:
-            self.status_bar.config(text=f"Error accessing directory: {str(e)}")
+            if hasattr(self, 'status_bar'):
+                self.status_bar.config(text=f"Error accessing directory: {str(e)}")
 
     def add_directory(self, parent, path, depth=0):
         try:
@@ -284,7 +289,8 @@ class NotePad:
                 self.tree.insert(parent, "end", text=f"... {remaining} more items", values=("", ""))
 
         except Exception as e:
-            self.status_bar.config(text=f"Error reading directory: {str(e)}")
+            if hasattr(self, 'status_bar'):
+                self.status_bar.config(text=f"Error reading directory: {str(e)}")
 
     def load_more(self, parent):
         """Load more items in a directory when requested"""
@@ -324,7 +330,8 @@ class NotePad:
                     continue
 
         except Exception as e:
-            self.status_bar.config(text=f"Error loading directory contents: {str(e)}")
+            if hasattr(self, 'status_bar'):
+                self.status_bar.config(text=f"Error loading directory contents: {str(e)}")
 
     def on_tree_double_click(self, event):
         item = self.tree.selection()[0]
@@ -332,7 +339,8 @@ class NotePad:
         
         if item_text.startswith(self.file_icon):            # Handle file opening
             full_path = self.tree.item(item)["values"][1]
-            self.status_bar.config(text=f"Opening: {full_path}")
+            if hasattr(self, 'status_bar'):
+                self.status_bar.config(text=f"Opening: {full_path}")
             
             try:
                 # Try UTF-8 first
