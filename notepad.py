@@ -604,7 +604,13 @@ class NotePad:
             cursor_pos = self.message_box.index(tk.INSERT)
             line, col = cursor_pos.split('.')
             file_name = self.current_file[0] if self.current_file[0] else "Untitled"
-            file_name = file_name.split('/')[-1]  # Show only filename, not full path
+            # Cross-platform filename extraction
+            try:
+                import os
+                file_name = os.path.basename(file_name)
+            except Exception:
+                # Fallback to previous behavior
+                file_name = file_name.split('/')[-1]
             status_text = f"Line: {line} | Col: {int(col)+1} | {file_name}"
             if hasattr(self, 'status_bar') and self.root.winfo_exists():
                 self.status_bar.config(text=status_text)

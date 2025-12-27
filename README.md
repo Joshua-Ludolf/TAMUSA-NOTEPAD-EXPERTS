@@ -40,7 +40,49 @@ The editor provides a basic interface for text manipulation, making it a useful 
 
 - **Emojis**: Based on Windows 11 builtin Emojis, allow for user expressions via visuals. In application, under Edit tab you'll find two options for inserting emojis, one less you manually pick from all emojis (`CTRL+E` also achieves this!) and the other is a reduced list from all types of emojis. 
 - **Font Management**: `See FONT_FEATURES.md`
-- **UV Package Manager Support**: See documentation from developer of this amazing python package manager - <a href=https://docs.astral.sh/uv/>`https://docs.astral.sh/uv/.` </a>
+ - **UV Package Manager Support**: See documentation from developer of this amazing python package manager - <a href=https://docs.astral.sh/uv/>`https://docs.astral.sh/uv/.` </a>
+
+
+## Quick Start
+
+- **Windows (PowerShell):**
+
+	```powershell
+	# Using UV (no extra dependencies required)
+	uv run .\execute.py
+
+	# Or with Python directly
+	python .\execute.py
+	```
+
+- **Linux/macOS (bash):**
+
+	```bash
+	# Using UV (no extra dependencies required)
+	uv run ./execute.py
+
+	# Or with Python directly
+	python3 ./execute.py
+	```
+
+### Requirements
+
+- Python 3.8+.
+- Tkinter is part of the standard library on Windows and macOS. On Debian/Ubuntu you may need:
+
+	```bash
+	sudo apt-get update && sudo apt-get install -y python3-tk
+	```
+
+### Notes
+
+- The project has no runtime PyPI dependencies; UV will start instantly without trying to install packages.
+- If you prefer running tests:
+
+	```bash
+	# From the project root
+	python -m unittest unit_tests.py
+	```
 
 
 
