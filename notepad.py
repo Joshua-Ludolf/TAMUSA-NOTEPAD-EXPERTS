@@ -82,10 +82,13 @@ class NotePad:
         # Create main container frame
         self.main_frame = tk.Frame(self.root, bg="#1a1a1a")
         self.main_frame.pack(fill=tk.BOTH, expand=True, padx=2, pady=2)
+        self.main_frame.grid_rowconfigure(0, weight=1)
+        self.main_frame.grid_rowconfigure(1, weight=0)
+        self.main_frame.grid_columnconfigure(0, weight=1)
 
         # Create horizontal paned window
         self.paned_window = ttk.PanedWindow(self.main_frame, orient=tk.HORIZONTAL)
-        self.paned_window.pack(fill=tk.BOTH, expand=True, padx=10, pady=(5, 10))
+        self.paned_window.grid(row=0, column=0, sticky="nsew", padx=10, pady=(5, 10))
 
         # Create and configure the file tree frame
         self.tree_frame = ttk.Frame(self.paned_window)
@@ -123,12 +126,12 @@ class NotePad:
             text="Ready",
             bg="#2d2d2d",
             fg="#23c4a4",
-            font=("Cascadia Code", 10),
+            font=("Cascadia Code", 14, "bold"),
             anchor=tk.W,
-            padx=10,
-            pady=5
+            padx=14,
+            pady=10
         )
-        self.status_bar.pack(fill=tk.X, side=tk.BOTTOM, padx=10, pady=(0, 5))
+        self.status_bar.grid(row=1, column=0, sticky="ew", padx=10, pady=(0, 8))
 
         # Bind events for status updates
         self.message_box.bind("<KeyPress>", self.update_status)
