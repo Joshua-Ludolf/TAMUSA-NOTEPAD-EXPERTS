@@ -13,6 +13,28 @@ import json
 import os
 
 
+def preferred_mono_font_family(root=None):
+    """Return a reasonable monospace font family available on this system."""
+    candidates = [
+        "Cascadia Code",  # Windows / dev machines
+        "DejaVu Sans Mono",  # common on Linux/Alpine
+        "Liberation Mono",
+        "Noto Sans Mono",
+        "Courier New",
+        "TkFixedFont",  # Tk fallback
+    ]
+
+    try:
+        available = set(font.families(root) if root is not None else font.families())
+    except Exception:
+        return "TkFixedFont"
+
+    for family in candidates:
+        if family in available:
+            return family
+    return "TkFixedFont"
+
+
 class FontManager:
     """
     A class to manage font settings for the text editor.
@@ -26,10 +48,17 @@ class FontManager:
     def __init__(self, text_widget):
         self.text_widget = text_widget
         self.config_file = "font_config.json"
+
+        try:
+            root = self.text_widget.winfo_toplevel()
+        except Exception:
+            root = None
+
+        default_family = preferred_mono_font_family(root)
         
         # Default font settings
         self.current_font = {
-            'family': 'Cascadia Code',
+            'family': default_family,
             'size': 12,
             'weight': 'normal',  # normal, bold
             'slant': 'roman',    # roman, italic
@@ -52,6 +81,14 @@ class FontManager:
                 with open(self.config_file, 'r') as f:
                     saved_config = json.load(f)
                     self.current_font.update(saved_config)
+
+            # If the saved font family isn't available on this platform, fall back.
+            try:
+                root = self.text_widget.winfo_toplevel()
+            except Exception:
+                root = None
+            if self.current_font.get('family') not in set(font.families(root)):
+                self.current_font['family'] = preferred_mono_font_family(root)
         except Exception as e:
             print(f"Error loading font config: {e}")
     
@@ -165,8 +202,13 @@ class FontManager:
     
     def reset_to_default(self):
         """Reset font settings to default"""
+        try:
+            root = self.text_widget.winfo_toplevel()
+        except Exception:
+            root = None
+        default_family = preferred_mono_font_family(root)
         self.current_font = {
-            'family': 'Cascadia Code',
+            'family': default_family,
             'size': 12,
             'weight': 'normal',
             'slant': 'roman',
@@ -502,10 +544,11 @@ class FontDialog:
         # Reset font family selection
         try:
             fonts = self.font_manager.get_available_fonts()
-            cascadia_index = fonts.index("Cascadia Code")
+            default_family = preferred_mono_font_family(self.parent)
+            default_index = fonts.index(default_family)
             self.family_listbox.selection_clear(0, tk.END)
-            self.family_listbox.selection_set(cascadia_index)
-            self.family_listbox.see(cascadia_index)
+            self.family_listbox.selection_set(default_index)
+            self.family_listbox.see(default_index)
         except ValueError:
             pass
         

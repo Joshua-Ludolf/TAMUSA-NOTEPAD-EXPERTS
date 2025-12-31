@@ -1,5 +1,6 @@
 import unittest
 import tkinter as tk
+from tkinter import font as tkfont
 import sys
 import os
 import tempfile
@@ -127,7 +128,17 @@ class TestNotepad(unittest.TestCase):
         # Test text widget font
         text_widget = self.notepad.message_box
         font_str = text_widget.cget("font")
-        self.assertTrue("Cascadia Code" in font_str and "12" in font_str)
+        # Tk may return a named font (e.g., "font1"); resolve to actual family/size.
+        resolved = tkfont.Font(root=self.root, font=font_str)
+        self.assertEqual(int(resolved.cget("size")), 12)
+        self.assertTrue(any(name in str(resolved.cget("family")) for name in [
+            "Cascadia Code",
+            "DejaVu",
+            "Liberation",
+            "Noto",
+            "TkFixedFont",
+            "Courier",
+        ]))
         print("✓ Text widget properties verified")
         
         # Test menu existence and properties

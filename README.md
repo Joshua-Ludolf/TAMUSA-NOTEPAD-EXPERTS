@@ -84,5 +84,86 @@ The editor provides a basic interface for text manipulation, making it a useful 
 	python -m unittest unit_tests.py
 	```
 
+## Docker
+
+This project is a Tkinter GUI app. Containers can run it, but showing the window requires a working display server (X11/WSLg).
+
+### Build (all platforms)
+
+```bash
+docker build -t tamusa-notepad:alpine .
+```
+
+### Run tests headlessly (all platforms)
+
+Runs the unit tests under a virtual X server (Xvfb) inside the container:
+
+```bash
+docker run --rm tamusa-notepad:alpine xvfb-run python -m unittest unit_tests.py
+```
+
+### Windows users (recommended: run from WSL2 with WSLg)
+
+Prerequisites:
+
+- Windows 11 + WSL2.
+- A WSL distro with WSLg enabled (GUI apps work inside WSL).
+
+Sanity check (inside WSL):
+
+```bash
+sudo apt-get update
+sudo apt-get install -y x11-apps
+xeyes
+```
+
+If `xeyes` opens, you can run the Tkinter app container and show the window via WSLg.
+
+Run the container (inside WSL):
+
+```bash
+docker run --rm \
+	-e DISPLAY=$DISPLAY \
+	-v /tmp/.X11-unix:/tmp/.X11-unix \
+	tamusa-notepad:alpine
+```
+
+Persist saved/created files to your project folder (inside WSL):
+
+```bash
+docker run --rm \
+	-e DISPLAY=$DISPLAY \
+	-v /tmp/.X11-unix:/tmp/.X11-unix \
+	-v "$(pwd)":/app \
+	tamusa-notepad:alpine
+```
+
+### Linux users (X11)
+
+Allow local containers to connect to your X server (choose one):
+
+```bash
+xhost +local:
+```
+
+Run the GUI container:
+
+```bash
+docker run --rm \
+	-e DISPLAY=$DISPLAY \
+	-v /tmp/.X11-unix:/tmp/.X11-unix \
+	tamusa-notepad:alpine
+```
+
+Persist saved/created files to your current folder:
+
+```bash
+docker run --rm \
+	-e DISPLAY=$DISPLAY \
+	-v /tmp/.X11-unix:/tmp/.X11-unix \
+	-v "$(pwd)":/app \
+	tamusa-notepad:alpine
+```
+
 
 
