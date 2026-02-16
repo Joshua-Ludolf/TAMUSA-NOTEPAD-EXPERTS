@@ -129,7 +129,7 @@ docker run --rm \
 ```
 
 Persist saved/created files to your project folder (inside WSL):
-
+*Ensure you clone this repo before running the following:*
 ```bash
 docker run --rm \
 	-e DISPLAY=$DISPLAY \
@@ -156,7 +156,7 @@ docker run --rm \
 ```
 
 Persist saved/created files to your current folder:
-
+*Ensure you clone this repo before running the following:*
 ```bash
 docker run --rm \
 	-e DISPLAY=$DISPLAY \
