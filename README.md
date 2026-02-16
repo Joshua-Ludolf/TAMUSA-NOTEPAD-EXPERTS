@@ -125,7 +125,7 @@ Run the container (inside WSL):
 docker run --rm \
 	-e DISPLAY=$DISPLAY \
 	-v /tmp/.X11-unix:/tmp/.X11-unix \
-	tamusa-notepad:alpine
+	joshludolf/tamusa-notepad:latest
 ```
 
 Persist saved/created files to your project folder (inside WSL):
@@ -135,7 +135,7 @@ docker run --rm \
 	-e DISPLAY=$DISPLAY \
 	-v /tmp/.X11-unix:/tmp/.X11-unix \
 	-v "$(pwd)":/app \
-	tamusa-notepad:alpine
+	joshludolf/tamusa-notepad:latest
 ```
 
 ### Linux users (X11)
@@ -152,7 +152,7 @@ Run the GUI container:
 docker run --rm \
 	-e DISPLAY=$DISPLAY \
 	-v /tmp/.X11-unix:/tmp/.X11-unix \
-	tamusa-notepad:alpine
+	joshludolf/tamusa-notepad:latest
 ```
 
 Persist saved/created files to your current folder:
@@ -162,7 +162,7 @@ docker run --rm \
 	-e DISPLAY=$DISPLAY \
 	-v /tmp/.X11-unix:/tmp/.X11-unix \
 	-v "$(pwd)":/app \
-	tamusa-notepad:alpine
+	joshludolf/tamusa-notepad:latest
 ```
 
 
