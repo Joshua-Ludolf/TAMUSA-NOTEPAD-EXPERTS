@@ -12,7 +12,7 @@ tamusa-notepad = "execute:main"
 [project.optional-dependencies]
 dev = [
     "black==25.11.0",
-    "isort==5.13.2",
+    "isort==6.1.0",
     "pytest==8.4.2",
     "pylint==3.3.9",
 ]
